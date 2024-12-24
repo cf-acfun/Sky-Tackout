@@ -91,7 +91,6 @@ public class EmployeeController {
         log.info("开始新增员工[{}]", employeeDTO);
         // 从 RequestContextHolder 获取 HttpServletRequest 对象
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-
         // 获取完整的请求 URL
         String requestURL = request.getRequestURL().toString();
         log.info("请求的完整URL: [{}]", requestURL);
@@ -105,6 +104,25 @@ public class EmployeeController {
         log.info("员工分页查询开始[{}]", employeePageQueryDTO);
         PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 启用禁用员工账号
+     * @param status 状态
+     * @param id 员工id
+     * @return 结果
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用员工账号")
+    public Result changeStatus(@PathVariable Integer status, Long id) {
+        log.info("启用禁用员工账号[{}]开始[{}]", id, status);
+        // 从 RequestContextHolder 获取 HttpServletRequest 对象
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        // 获取完整的请求 URL
+        String requestURL = request.getRequestURL().toString();
+        log.info("请求的完整URL: [{}]", requestURL);
+        employeeService.changeStatus(status, id);
+        return Result.success();
     }
 
 
