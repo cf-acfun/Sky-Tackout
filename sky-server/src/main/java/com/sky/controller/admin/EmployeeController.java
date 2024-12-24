@@ -16,7 +16,10 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,6 +89,12 @@ public class EmployeeController {
     @ApiOperation("新增员工")
     public Result<String> save(@RequestBody EmployeeDTO employeeDTO) {
         log.info("开始新增员工[{}]", employeeDTO);
+        // 从 RequestContextHolder 获取 HttpServletRequest 对象
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+        // 获取完整的请求 URL
+        String requestURL = request.getRequestURL().toString();
+        log.info("请求的完整URL: [{}]", requestURL);
         employeeService.save(employeeDTO);
         return Result.success();
     }
