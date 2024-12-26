@@ -1,8 +1,10 @@
 package com.sky.config;
 
 import com.sky.config.beanprocessors.HandlerMappingLoggerPostProcessor;
+import com.sky.config.beanprocessors.LogMappingInfoRequestMappingHandlerMapping;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * @Author: ChenFeng
@@ -15,5 +17,10 @@ public class AppConfig {
     @Bean
     public HandlerMappingLoggerPostProcessor handlerMappingLoggerPostProcessor() {
         return new HandlerMappingLoggerPostProcessor();
+    }
+
+    @Bean
+    public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+        return new LogMappingInfoRequestMappingHandlerMapping();
     }
 }
