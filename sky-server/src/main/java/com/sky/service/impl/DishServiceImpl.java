@@ -16,14 +16,19 @@ import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Description:
@@ -120,5 +125,47 @@ public class DishServiceImpl implements DishService {
         // 代码优化：将多次数据库操作合并为批量操作，减少数据库连接的开销。
         dishMapper.deleteBatchByIds(ids);
         dishFlavorMapper.deleteBatchByDishIds(ids);
+    }
+
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+
+        DishVO dishVO = new DishVO();
+        // 查询菜品
+        Dish dish = dishMapper.getById(id);
+        BeanUtils.copyProperties(dish, dishVO);
+        // 查询菜品对应的口味
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getDishFlavorsByDishId(dish.getId());
+        log.info("查询到的口味为[{}]", dishFlavors);
+        // 组装返回结果
+        dishVO.setFlavors(dishFlavors);
+        return dishVO;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result updateDishWithFlavors(DishDTO dishDTO) {
+        // 修改菜品基本信息
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        try {
+            dishMapper.updateByDishId(dish);
+            // 口味信息删除之后再进行重新插入
+            // 判断有无口味信息
+            if (dishDTO.getFlavors() != null) {
+                // 删除当前菜品对应的口味
+                dishFlavorMapper.deleteByDishId(dishDTO.getId());
+                // 重新插入口味
+                // 给菜品口味赋值菜品Id,使用Stream流操作List给口味列表的每个口味赋值菜品id
+                List<DishFlavor> dishFlavors = dishDTO.getFlavors().stream()
+                        .peek(dishFlavor -> dishFlavor.setDishId(dishDTO.getId()))
+                        .collect(Collectors.toList());
+                dishFlavorMapper.insertBatch(dishFlavors);
+            }
+        } catch (Exception e) {
+            log.error("修改菜品失败", e);
+            return Result.error("修改菜品失败");
+        }
+        return Result.success();
     }
 }
