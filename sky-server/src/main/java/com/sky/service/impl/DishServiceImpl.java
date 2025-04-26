@@ -102,7 +102,7 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteBatch(List<Long> ids) {
         // 判断当前菜品是否启售中
         for (Long id : ids) {
