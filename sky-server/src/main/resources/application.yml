@@ -28,6 +28,8 @@ logging:
         mapper: debug
         service: info
         controller: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] [TRACE-ID:%X{traceId}] %-5level %logger{36} - %msg%n"
 
 sky:
   jwt:

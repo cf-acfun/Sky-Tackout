@@ -1,6 +1,7 @@
 package com.sky.config;
 
 import com.sky.interceptor.JwtTokenAdminInterceptor;
+import com.sky.interceptor.TraceIdInterceptor;
 import com.sky.json.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Autowired
     private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
 
+    @Autowired
+    private TraceIdInterceptor traceIdInterceptor;
+
     /**
      * 注册自定义拦截器
      * @param registry
@@ -39,6 +43,11 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         log.info("开始注册自定义拦截器...");
         registry.addInterceptor(jwtTokenAdminInterceptor)
                 .addPathPatterns("/admin/**")
+                .excludePathPatterns("/admin/employee/login");
+
+        // 增加日志生成TraceId拦截器
+        registry.addInterceptor(traceIdInterceptor)
+                .addPathPatterns("/")
                 .excludePathPatterns("/admin/employee/login");
     }
 
