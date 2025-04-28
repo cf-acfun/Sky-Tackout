@@ -1,5 +1,6 @@
 package com.sky.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -10,6 +11,7 @@ import java.util.UUID;
  * @Description:
  */
 @Component
+@Slf4j
 public class TraceIdGenerator {
 
     public String generateTraceId() {

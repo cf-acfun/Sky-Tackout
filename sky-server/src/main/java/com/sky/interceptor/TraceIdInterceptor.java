@@ -1,6 +1,7 @@
 package com.sky.interceptor;
 
 import com.sky.utils.TraceIdGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * MDC 是日志框架（如 Logback/Log4j2）提供的线程本地变量存储工具，底层基于 ThreadLocal，能直接与日志模板集成。
  */
 @Component
+@Slf4j
 public class TraceIdInterceptor implements HandlerInterceptor {
 
     @Autowired
@@ -24,7 +26,8 @@ public class TraceIdInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String transId = traceIdGenerator.generateTraceId();
-        MDC.put("transId", transId);
+        log.info("traceId = [{}]", transId);
+        MDC.put("traceId", transId);
         return true;
     }
 
